@@ -32,6 +32,22 @@ namespace Oxide.Plugins
                 ["PrestigeReset"] = "Prestige level has been reset for player {player}."
             };
 
+            public List<string> IgnoredBlueprints { get; set; } = new()
+            {
+                "discord.trophy",
+                "fogmachine",
+                "strobelight",
+                "kayak",
+                "dart.incapacitate",
+                "dart.radiation",
+                "dart.scatter",
+                "dart.wood",
+                "boots.frog",
+                "draculacape",
+                "m249"
+            };
+
+
             public string TitleFormat { get; set; } = "[P{level}]";
             public string TitleColorHex { get; set; } = "#FFD700"; // Gold color for title
             public string BroadcastMessage { get; set; } = "{player} has reached Prestige Level {level}!";
@@ -165,9 +181,14 @@ namespace Oxide.Plugins
                 if (bp.targetItem == null || bp.defaultBlueprint)
                     continue;
 
+                string shortname = bp.targetItem.shortname;
+
+                if (config.IgnoredBlueprints.Contains(shortname))
+                    continue;
+
                 if (!player.blueprints.IsUnlocked(bp.targetItem))
                 {
-                    PrintWarning($"Player {player.displayName} missing blueprint: {bp.targetItem.displayName.english}");
+                    PrintWarning($"Player {player.displayName} missing blueprint: {bp.targetItem.displayName.english} ({shortname})");
                     return false;
                 }
             }
@@ -303,5 +324,7 @@ namespace Oxide.Plugins
         {
             Interface.Oxide.DataFileSystem.WriteObject(Name, prestigeLevels);
         }
+
+
     }
 }
