@@ -235,11 +235,10 @@ namespace Oxide.Plugins
                 BetterChat.Call("API_AddGroup", groupName);
                 BetterChat.Call("API_SetGroupField", groupName, "priority", "1");
                 BetterChat.Call("API_SetGroupField", groupName, "TitleColor", config.TitleColorHex); // Set golden color here
+                BetterChat.Call("API_SetGroupField", groupName, "title", title);
 
             }
 
-            BetterChat.Call("API_SetGroupField", groupName, "title", title);
-            BetterChat.Call("API_SetGroupField", groupName, "color", config.TitleColorHex); // Set golden color here
         }
 
         private void AddPlayerToBetterChatGroup(BasePlayer player, string groupName)
