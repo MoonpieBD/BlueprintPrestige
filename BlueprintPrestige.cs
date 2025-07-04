@@ -77,7 +77,7 @@ namespace Oxide.Plugins
             }
             else
             {
-                BetterChat.Call("API_RegisterThirdPartyTitle", this, new Func<IPlayer, string>(GetPrestigeTitle));
+                //BetterChat.Call("API_RegisterThirdPartyTitle", this, new Func<IPlayer, string>(GetPrestigeTitle));
             }
         }
 
