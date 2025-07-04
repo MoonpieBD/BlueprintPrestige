@@ -2,6 +2,7 @@ using Oxide.Core;
 using Oxide.Core.Plugins;
 using Oxide.Core.Libraries.Covalence;
 using Oxide.Game.Rust.Cui;
+using Oxide.Core.Libraries;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -217,28 +218,33 @@ namespace Oxide.Plugins
             });
 
             BroadcastPrestige(player, level);
+            string groupName = $"prestige{level}";
+            string title = config.TitleFormat.Replace("{level}", level.ToString());
 
-            if (BetterChat != null)
+            CreateOrUpdateBetterChatGroup(groupName, title);
+
+            permission.AddUserGroup(player.UserIDString, groupName);
+            if (level > 1)
             {
-                string groupName = $"prestige{level}";
-                string title = config.TitleFormat.Replace("{level}", level.ToString());
-
-                CreateOrUpdateBetterChatGroup(groupName, title);
-                AddPlayerToBetterChatGroup(player, groupName);
+                string previousGroup = $"prestige{level - 1}";
+                if (permission.GroupExists(previousGroup))
+                {
+                    permission.RemoveUserGroup(player.UserIDString, previousGroup);
+                }
             }
+
         }
 
         private void CreateOrUpdateBetterChatGroup(string groupName, string title)
         {
-            if (!(bool)BetterChat.Call("API_GroupExists", groupName))
+            if (!permission.GroupExists(groupName))
             {
+                permission.CreateGroup(groupName, title, 0);
                 BetterChat.Call("API_AddGroup", groupName);
-                BetterChat.Call("API_SetGroupField", groupName, "priority", "1");
-                BetterChat.Call("API_SetGroupField", groupName, "TitleColor", config.TitleColorHex); // Set golden color here
+                BetterChat.Call("API_SetGroupField", groupName, "priority", "3");
+                BetterChat.Call("API_SetGroupField", groupName, "TitleColor", config.TitleColorHex);
                 BetterChat.Call("API_SetGroupField", groupName, "title", title);
-
             }
-
         }
 
         private void AddPlayerToBetterChatGroup(BasePlayer player, string groupName)
@@ -246,7 +252,7 @@ namespace Oxide.Plugins
             var playerObj = covalence.Players.FindPlayerById(player.UserIDString);
             if (playerObj == null) return;
 
-            BetterChat.Call("API_AddUserToGroup", playerObj, groupName);
+            permission.AddUserGroup(playerObj.Id, groupName);
         }
 
         private void SendMessage(BasePlayer player, string key, Dictionary<string, string> tokens = null)
